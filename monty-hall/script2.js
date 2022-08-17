@@ -2,6 +2,7 @@ const play2 = document.getElementById('play2');
 play2.addEventListener('click',playTwo);
 
 function PlayTwo(){
+
 var rounds = Number(prompt(`How many simulations would you like to run?`));
 
 var switchDoor = confirm(`Will you be switching your initial choice?`);
