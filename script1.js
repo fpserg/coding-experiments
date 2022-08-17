@@ -1,7 +1,7 @@
 const playOne = document.getElementById('play1');
-runMe.addEventListener('click',play1);
+playOne.addEventListener('click',playOne);
 
-function play1(){
+function playOne(){
 
 //set variable for opening door
 var doorOpen;
