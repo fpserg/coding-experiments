@@ -1,5 +1,5 @@
-const playOne = document.getElementById('play1');
-playOne.addEventListener('click',playOne);
+const play1 = document.getElementById('play1');
+play1.addEventListener('click',playOne);
 
 function playOne(){
 
