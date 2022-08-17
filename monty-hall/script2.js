@@ -1,7 +1,7 @@
 const play2 = document.getElementById('play2');
 play2.addEventListener('click',playTwo);
 
-function PlayTwo(){
+function playTwo(){
 
 var rounds = Number(prompt(`How many simulations would you like to run?`));
 
