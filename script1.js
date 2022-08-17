@@ -1,3 +1,8 @@
+const playOne = document.getElementById('play1');
+runMe.addEventListener('click',play1);
+
+function play1(){
+
 //set variable for opening door
 var doorOpen;
 // set variable for counting rounds
@@ -94,3 +99,4 @@ console.log(`Wincount = ${winCount}`);
 console.log(`Losscount = ${lossCount}`);
 
 alert(`You played ${i} rounds and switched the initial door ${switchCount} times. You won ${winCount} times and lost ${lossCount} times`)
+}
