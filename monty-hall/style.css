@@ -1,0 +1,14 @@
+body {
+  width: auto;
+  margin: 10px;
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 400;
+  font-variant-ligatures: normal;
+  font-size: medium;
+  letter-spacing: 1px;
+}
+
+h1 {
+  color:red
+}
