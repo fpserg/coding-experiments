@@ -41,3 +41,8 @@ input {
   font-variant-ligatures: normal;
   height: 30px;
 }
+
+#chart {
+  height: 480px;
+  width: 640px;
+}
