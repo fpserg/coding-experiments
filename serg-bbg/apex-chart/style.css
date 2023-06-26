@@ -1,0 +1,43 @@
+body {
+  width: auto;
+  margin: 10px;
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 400;
+  font-variant-ligatures: normal;
+  font-size: medium;
+  letter-spacing: 1px;
+  background-color: black;
+  color: white;
+}
+
+h1 {
+  color: red
+}
+
+button {
+  background-color: orange;
+  color: black;
+  border-color: orange;
+  border-radius: 5px;
+  font-size: medium;
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 400;
+  font-variant-ligatures: normal;
+  height: 40px;
+  width: 60px;
+  padding: 0px;
+}
+
+input {
+  background-color: black;
+  color: white;
+  border-color: orange;
+  font-size: medium;
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 400;
+  font-variant-ligatures: normal;
+  height: 30px;
+}
