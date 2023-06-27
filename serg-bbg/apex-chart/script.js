@@ -1,5 +1,12 @@
 const go = document.getElementById("go");
 go.addEventListener("click", main);
+var input = document.getElementById("ticker");
+input.addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    document.getElementById("go").click();
+  }
+});
 
 function main(){
  const ticker = document.getElementById("ticker").value.toUpperCase();
@@ -86,7 +93,7 @@ document.getElementById("chart").innerHTML = "";
 
 var options = {
   chart: {
-    type: 'line'
+    type: 'line',
   },
   colors: ['#ffa500'],
   series: [{
@@ -100,7 +107,12 @@ var options = {
     }
   },
   yaxis: {
-    decimalsInFloat: 0
+    decimalsInFloat: 0,
+    labels: {
+      style:{
+        colors: []
+      }
+    }
   },
   tooltip: {
     theme: 'dark'
@@ -111,7 +123,11 @@ var chart = new ApexCharts(document.querySelector("#chart"), options);
 
 chart.render();
 
+
+
+
 console.log(priceArray);
+
 
 }
 }
