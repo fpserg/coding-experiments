@@ -46,3 +46,8 @@ input {
   height: 480px;
   width: 640px;
 }
+
+.apexcharts-menu{
+background-color: #27293d!important;
+border: 0px;
+}
