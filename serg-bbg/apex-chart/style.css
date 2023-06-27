@@ -45,10 +45,5 @@ input {
 #chart {
   height: 480px;
   width: 640px;
-}
-
-.apexcharts-menu{
-background-color: #27293d;
-color: black;
-border: 0px;
+  color: black;
 }
