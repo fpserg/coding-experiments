@@ -43,7 +43,6 @@ input {
 }
 
 #chart {
-  height: 480px;
-  width: 640px;
+  max-width: 640px;
   color: black;
 }
