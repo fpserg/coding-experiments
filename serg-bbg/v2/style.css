@@ -50,6 +50,7 @@ input {
 
 table {
   width: 100%;
+  max-width: 640px;
   border-collapse: collapse;
 }
 
