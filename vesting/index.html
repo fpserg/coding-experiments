@@ -1,1 +1,55 @@
-hello world
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <title>Vesting Reset Calculator</title>
+</head>
+<body>
+  <h1>Vesting Reset Calculator</h1>
+  <div id="output"></div>
+  <script>
+    function loadJSON(path, success, error) {
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            success(JSON.parse(xhr.responseText));
+      }
+          else {
+            error(xhr);
+          }
+        }
+      };
+      xhr.open('GET', path, true);
+      xhr.send();
+    }
+
+    loadJSON("https://nodes.wavesnodes.com/blocks/height", myData);
+
+    let reset = 3962880;
+
+    function myData(Data)
+    {
+      let height = Data["height"];
+      while (height > reset) {
+        reset += 1440
+      }
+
+    let blocksToReset = reset - height;
+
+    let resetTime = new Date(Date.now() + blocksToReset * 60000).toUTCString();
+  document.getElementById("output").innerHTML = `
+<p>Current block: ${height}</p>
+
+<p>Next reset block: ${reset}</p>
+
+<p>Blocks until reset: ${blocksToReset}</p>
+
+<p>Approx. reset time: ${resetTime}</p>
+`;
+
+}
+  </script>
+</body>
+</html>
