@@ -8,7 +8,10 @@
 <body>
   <h1>Vesting Reset Calculator</h1>
   <div id="output"></div>
+
   <script>
+    main()
+    function main(){
     function loadJSON(path, success, error) {
       var xhr = new XMLHttpRequest();
       xhr.onreadystatechange = function () {
@@ -25,17 +28,15 @@
       xhr.send();
     }
 
-    loadJSON("https://nodes.wavesnodes.com/blocks/height", myData);
-
-    let reset = 3962880;
+    loadJSON("https://nodes.wavesnodes.com/blocks/height", myData);    
 
     function myData(Data)
     {
+      let reset = 3962880;
       let height = Data["height"];
       while (height > reset) {
         reset += 1440
-      }
-
+      
     let blocksToReset = reset - height;
 
     let resetTime = new Date(Date.now() + blocksToReset * 60000).toUTCString();
@@ -48,8 +49,13 @@
 
 <p>Approx. reset time: ${resetTime}</p>
 `;
-
+if (height < reset) {
+setTimeout(main, 1000)
 }
-  </script>
+}
+}
+}
+
+</script>
 </body>
 </html>
