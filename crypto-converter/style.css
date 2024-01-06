@@ -1,0 +1,75 @@
+body {
+  width: auto;
+  margin: 10px;
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 400;
+  font-variant-ligatures: normal;
+  font-size: medium;
+  letter-spacing: 1px;
+  background-color: black;
+  color: white;
+}
+
+h1 {
+  color: red
+}
+
+button {
+  background-color: orange;
+  color: black;
+  border-color: orange;
+  border-radius: 5px;
+  font-size: medium;
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 400;
+  font-variant-ligatures: normal;
+  height: 40px;
+  width: 15%;
+  padding: 0px;
+}
+
+input {
+  background-color: black;
+  color: white;
+  border-color: orange;
+  font-size: medium;
+  font-family: system-ui;
+  font-style: normal;
+  font-weight: 400;
+  font-variant-ligatures: normal;
+  height: 30px;
+  width: 20%;
+}
+
+#chart {
+  width: 100%;
+  max-width: 640px;
+  color: black;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #ffffff;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+#fc {
+  text-align: left;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  text-align: center;
+  width: 100%;
+  font-weight: auto;
+  font-size: small;
+  font-style: italic;
+}
