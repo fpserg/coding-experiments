@@ -7,12 +7,33 @@
   <link rel="stylesheet" href="style.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.2/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.18.1/dist/apexcharts.js"></script>
+
 </head>
 <body>
   <h1>crypto_cnvrtr</h1>
-  <input id="ticker1" placeholder="Ticker 1" value="eth"></input>
-  <input id="ticker2" placeholder="Ticker 2" value="btc"></input>
-  <input id="period" placeholder="Period" value="100"></input>
+
+  <table>
+    <tr>
+      <td style="width:25%">Ticker 1</td>
+      <td><input id="ticker1" placeholder="Ticker 1" value="eth"></input></td>
+      <td style="width:25%">MA-1</td>
+      <td><input id="ma1" name="ma1" 
+type="number" value="90"/></td>
+    </tr>
+    <tr>
+      <td>Ticker 2</td>
+      <td><input id="ticker2" placeholder="Ticker 2" value="btc"></input></td>
+      <td>MA-2</td>
+      <td><input id="ma2" name="ma2" type="number" value="30"/></td>
+    </tr>
+    <tr>
+      <td>Days</td>
+      <td><input id="period" placeholder="Period" value="365"></input></td>
+      <td>MA-3</td>
+      <td><input id="ma3" name="ma3" type="number" value="7"/></td>
+    </tr>
+  </table>
+
   <button id="go">Go!</button>
   <div id="output"></div>
   <div id="chart"></div>
