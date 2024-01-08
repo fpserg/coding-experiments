@@ -12,14 +12,17 @@ let ticker2 = document.getElementById("ticker2").value.toUpperCase()
 
 let timeFrame = document.getElementById("period").value
 
-//let ticker1 = "osmo"
-//let ticker2 = "ton"
-
-
 function getIdByTicker(ticker){
 let idUrl = "https://api.coingecko.com/api/v3/search?query=" + ticker;
 
-const cryptoData =  $.parseJSON($.get(idUrl)["responseText"])["coins"];
+let cryptoData 
+
+try {
+  cryptoData = $.parseJSON($.get(idUrl)["responseText"])["coins"]
+  } 
+catch(err){
+  alert(err)
+  };
 
 let cryptoId
 
@@ -32,15 +35,19 @@ for (let i=0; i<cryptoData.length; i++){
 
 const url = "https://api.coingecko.com/api/v3/coins/" + cryptoId + "/market_chart?vs_currency=usd&days=" + timeFrame + "&interval=daily&precision=8"
 
-console.log(cryptoId)
-
 const datePrice =  $.parseJSON($.get(url)["responseText"])["prices"];
 
 let priceArray = []
 let dateArray = []
 
 for (let i=0; i<parseInt(timeFrame); i++){
-  priceArray.push(datePrice[i][1])
+  try {
+    priceArray.push(datePrice[i][1])
+    }
+  catch(err) {
+    alert(err)
+    break
+    } 
   }
 for (let i=0; i<parseInt(timeFrame); i++){
   dateArray.push(new Date(datePrice[i][0]).toDateString())
@@ -52,6 +59,7 @@ return newArray
 
 }
 
+
 let a = getIdByTicker(ticker1)[1]
 let b = getIdByTicker(ticker2)[1]
 let d = getIdByTicker(ticker1)[0]
@@ -60,10 +68,41 @@ for (let i=0; i<a.length; i++){
 c[i] = a[i] / b[i]
 }
 
-console.log(a)
-console.log(b)
-console.log(c)
-console.log(d)
+function ma(maRange) {
+
+let maArray = [];
+
+for (let i=0; i<maRange; i++) {
+  maArray.push(null)
+}
+
+for (let i=maRange+1; i<=timeFrame; i++) {
+  let sm = 0;
+  for (let j=i-maRange; j<i; j++) {
+    sm += c[j]
+  }
+  sm /= maRange
+  maArray.push(Math.round(sm*1e8)/1e8)
+}
+
+return maArray
+}
+
+let p1 = parseInt(document.getElementById("ma1").value)
+let p2 = parseInt(document.getElementById("ma2").value)
+let p3 = parseInt(document.getElementById("ma3").value)
+
+let ma1 = ma(p1);
+let ma2 = ma(p2);
+let ma3 = ma(p3);
+
+//console.log(a)
+//console.log(b)
+//console.log(c)
+//console.log(d)
+console.log(ma1)
+console.log(ma2)
+console.log(ma3)
 
 document.getElementById("output").innerHTML = `<p>${ticker1.toUpperCase()}/${ticker2.toUpperCase()}
 <br>
@@ -85,11 +124,25 @@ var options = {
   stroke: {
     width: 1
   },
-  colors: ['#ffa500'],
-  series: [{
+  colors: ['#ffa500', '#ff0000', '#00ff00', '#ffffff'],
+  series: [
+  {
     name: 'price',
     data: c
-  }],
+  },
+  {
+    name: `ma-${p1}`,
+    data: ma1
+  },
+  {
+    name: `ma-${p2}`,
+    data: ma2
+  },
+  {
+    name: `ma-${p3}`,
+    data: ma3
+  },
+],
   xaxis: {
     categories: d,
     labels: {
