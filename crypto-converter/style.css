@@ -1,11 +1,11 @@
 body {
   width: auto;
   margin: 10px;
-  font-family: system-ui;
+  font-family: 'ZX Spectrum-7', sans-serif;                                          
   font-style: normal;
   font-weight: 400;
   font-variant-ligatures: normal;
-  font-size: medium;
+  font-size: xx-large;
   letter-spacing: 1px;
   background-color: black;
   color: white;
@@ -15,13 +15,19 @@ h1 {
   color: red
 }
 
+h2 {
+  font-family: 'ZX Spectrum-7', sans-serif;
+  font-weight: 400;
+}
+
 button {
   background-color: orange;
   color: black;
   border-color: orange;
   border-radius: 5px;
-  font-size: medium;
-  font-family: system-ui;
+  font-size: xx-large;
+  font-family: 'ZX Spectrum-7', sans-serif;
+  font-family: 'ZX Spectrum7 Bold', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-variant-ligatures: normal;
@@ -34,8 +40,9 @@ input {
   background-color: black;
   color: white;
   border-color: orange;
-  font-size: medium;
-  font-family: system-ui;
+  font-size: xx-large;
+  font-family: 'ZX Spectrum-7', sans-serif;
+  
   font-style: normal;
   font-weight: 400;
   font-variant-ligatures: normal;
@@ -56,6 +63,7 @@ img {
 
 table {
   width: 100%;
+  max-width: 640px;
   border-collapse: collapse;
   border-spacing: 0px;
 }
