@@ -101,9 +101,9 @@ document.getElementById("output").innerHTML =
 `<table>
   <tr>
     <th></th>
-    <th>23</th>
     <th>24</th>
     <th>25</th>
+    <th>26</th>
   </tr>
   <tr>
     <td id="fc">EV/S</td>
