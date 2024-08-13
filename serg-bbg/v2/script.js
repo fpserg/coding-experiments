@@ -12,7 +12,7 @@ function main(){
  const ticker = document.getElementById("ticker").value.toUpperCase();
  var marketdata = "https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities/" + ticker + ".json";
  var hist = "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/" + ticker + ".json";
- var db = "https://fpserg.github.io/my-python/py-script/data.json";
+ var db = "https://fpserg.github.io/coding-experiments/serg-bbg/v2/data.json";
   
  // loadJSON method to open the JSON file.
  function loadJSON(path, success) {
