@@ -48,7 +48,17 @@ document.getElementById("hpEnemy").innerHTML = `<h1>${hpEnemy}</h1>`
 
   if(hpEnemy==0){
     gameOn = false;
-    alert("You win!")
+
+    popupOk.style.display = "block";
+    popupOk.style.height = "30%";
+    document.getElementById("popup-round-text").innerHTML = `<h1>You win!</h1>`
+    document.getElementById("popup-round-text-2").innerHTML = ``
+    overlay1.classList.add("show");
+    
+    ol1.addEventListener("click", () => {
+  overlay1.classList.add("show");
+});
+    
     fightButton.disabled = false;
 hitButton.removeEventListener("touchstart", hit);
     return ms *= 0.8;
@@ -64,8 +74,19 @@ document.getElementById("hpPlayer").innerHTML = `<h1>${hpPlayer}</h1>`
 
     if(hpPlayer==0 && gameOn==true){
     gameOn = false;
-    alert(`Game over!
-You survived ${rndCnt} rounds.`);
+    
+    popupOk.style.display = "block";
+    popupOk.style.height = "52%";
+    document.getElementById("popup-round-text").innerHTML = `
+<h1>Game over!</h1>`
+document.getElementById("popup-round-text-2").innerHTML = `<h2 style="text-align: center">You survived ${rndCnt} rounds.</h2>`
+
+    overlay1.classList.add("show");
+    
+    ol1.addEventListener("click", () => {
+  overlay1.classList.add("show");
+});
+
     fightButton.disabled = false;
     return rndCnt = 0, ms = 1000;
     }
@@ -80,9 +101,15 @@ const popup = document.getElementById("popup");
 
 const help = document.getElementById("help");
 
-const ok = document.getElementById("btnOk");
+const helpOk = document.getElementById("helpOk");
+
+const popupOk = document.getElementById("popupOk");
+
+const popupRoundClose = document.getElementById("popup-round-close");
 
 const ol = document.getElementById("overlay");
+
+const ol1 = document.getElementById("overlay1");
 
 help.addEventListener("click", () => {
   // при клике на кнопку "deleteBtn" устанавливаем CSS свойство "display" элемента с id "popup" на "block", чтобы показать попап.
@@ -92,12 +119,19 @@ help.addEventListener("click", () => {
   overlay.classList.add("show");
 });
 
-ok.addEventListener("click", () => {
+helpOk.addEventListener("click", () => {
   popup.style.display = "none";
   overlay.classList.remove("show");
+  overlay1.classList.remove("show");
 });
 
 ol.addEventListener("click", () => {
   popup.style.display = "none";
   overlay.classList.remove("show");
 });
+
+popupRoundClose.addEventListener("click", () => {
+  popupOk.style.display = "none";
+  overlay1.classList.remove("show");
+});
+
