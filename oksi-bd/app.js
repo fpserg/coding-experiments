@@ -1,19 +1,39 @@
 const { Telegraf } = require('telegraf');
-const bot = new Telegraf('YOUR_BOT_TOKEN');
+const bot = new Telegraf('8036197285:AAGhkhqHugZnmHjX3hyCFg-AFkggbNLv43g');
 
 // Define your questions and answers
 const questions = [
     {
-        question: 'What is 2 + 2?',
-        answer: '4'
+        question: `
+Свет мой, Зеркальце, скажи,
+Да всю правду доложи:
+Сколько в жизни есть твоей
+Молодых богатырей?
+        `,
+        answer: '3'
     },
     {
-        question: 'What is 5 × 3?',
-        answer: '15'
+        question: 
+`
+Свет мой, Зеркальце, скажи,
+Да всю правду доложи:
+Сколько у тебя принцесс,
+Чьих-то будущих невест?
+`,
+        answer: '1'
     },
     {
-        question: 'What is 100 ÷ 4?',
-        answer: '25'
+        question: `
+Ничто, пустота, от бублика дырка.
+Делить на него - большая ошибка.
+`,
+        answer: '0'
+    },
+    {
+        question: `
+Лучшая оценка и день рождения Окси
+`,
+        answer: '5'
     }
 ];
 
@@ -23,7 +43,7 @@ const userProgress = new Map();
 bot.start((ctx) => {
     const userId = ctx.from.id;
     userProgress.set(userId, 0);
-    ctx.reply(`Let's start! First question: ${questions[0].question}`);
+    ctx.reply(`${questions[0].question}`);
 });
 
 bot.on('text', (ctx) => {
@@ -43,13 +63,14 @@ bot.on('text', (ctx) => {
         
         if (nextQuestionIndex < questions.length) {
             userProgress.set(userId, nextQuestionIndex);
-            return ctx.reply(`✅ Correct! Next question: ${questions[nextQuestionIndex].question}`);
+            return ctx.reply(`✅ 
+${questions[nextQuestionIndex].question}`);
         } else {
             userProgress.delete(userId);
-            return ctx.reply('🎉 Congratulations! You answered all questions correctly!');
+            return ctx.reply('🎉 Молодец! Ты правильно ответила на все вопросы, забирай заслуженный приз!');
         }
     } else {
-        return ctx.reply('❌ Incorrect answer. Try again: ' + currentQuestion.question);
+        return ctx.reply(`❌ Почти! Попробуй ещё: ${currentQuestion.question}`);
     }
 });
 
