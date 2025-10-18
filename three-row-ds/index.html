@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра 3 в ряд</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 400px;
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+            gap: 2px;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .cell.selected {
+            transform: scale(0.9);
+            box-shadow: 0 0 0 3px white;
+        }
+
+        .cell.moving {
+            z-index: 10;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .instructions {
+            max-width: 500px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .combo {
+            position: absolute;
+            font-size: 24px;
+            font-weight: bold;
+            color: gold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <h1>Игра "3 в ряд"</h1>
+    
+    <div class="game-container">
+        <div class="game-info">
+            <div>Очки: <span id="score">0</span></div>
+            <div>Ходы: <span id="moves">0</span></div>
+            <div>Время: <span id="time">60</span> сек</div>
+        </div>
+        
+        <div class="game-board" id="gameBoard"></div>
+        
+        <div class="controls">
+            <button id="restartBtn">Новая игра</button>
+            <button id="hintBtn">Подсказка</button>
+        </div>
+        
+        <div class="instructions">
+            <h3>Как играть:</h3>
+            <p>Кликайте на две соседние клетки, чтобы поменять их местами. Соберите 3 или более одинаковых элемента в ряд по горизонтали или вертикали, чтобы они исчезли и принесли вам очки.</p>
+        </div>
+    </div>
+
+    <script>
+        // Конфигурация игры
+        const BOARD_SIZE = 8;
+        const CELL_TYPES = 6;
+        const GAME_TIME = 60; // секунды
+
+        // Состояние игры
+        let gameState = {
+            board: [],
+            score: 0,
+            moves: 0,
+            timeLeft: GAME_TIME,
+            selectedCell: null,
+            isSwapping: false,
+            isAnimating: false,
+            gameActive: true,
+            timer: null
+        };
+
+        // Символы для разных типов клеток
+        const symbols = ['🍎', '🍌', '🍇', '🍊', '🍓', '🍉'];
+
+        // Инициализация игры
+        function initGame() {
+            clearInterval(gameState.timer);
+            
+            // Сброс состояния игры
+            gameState = {
+                board: [],
+                score: 0,
+                moves: 0,
+                timeLeft: GAME_TIME,
+                selectedCell: null,
+                isSwapping: false,
+                isAnimating: false,
+                gameActive: true
+            };
+            
+            // Обновление UI
+            document.getElementById('score').textContent = '0';
+            document.getElementById('moves').textContent = '0';
+            document.getElementById('time').textContent = GAME_TIME;
+            
+            // Создание игрового поля
+            createBoard();
+            
+            // Запуск таймера
+            gameState.timer = setInterval(updateTimer, 1000);
+        }
+
+        // Создание игрового поля
+        function createBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';
+            
+            // Инициализация массива доски
+            gameState.board = [];
+            
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                gameState.board[row] = [];
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    // Создаем случайный тип клетки, избегая совпадений
+                    let type;
+                    do {
+                        type = Math.floor(Math.random() * CELL_TYPES);
+                    } while (
+                        (row >= 2 && gameState.board[row-1][col] === type && gameState.board[row-2][col] === type) ||
+                        (col >= 2 && gameState.board[row][col-1] === type && gameState.board[row][col-2] === type)
+                    );
+                    
+                    gameState.board[row][col] = type;
+                    
+                    // Создание элемента клетки
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.textContent = symbols[type];
+                    cell.style.backgroundColor = getColor(type);
+                    
+                    // Обработчик клика
+                    cell.addEventListener('click', () => handleCellClick(row, col));
+                    
+                    gameBoard.appendChild(cell);
+                }
+            }
+            
+            // Проверка на возможные ходы
+            if (!hasValidMoves()) {
+                shuffleBoard();
+            }
+        }
+
+        // Получение цвета для типа клетки
+        function getColor(type) {
+            const colors = [
+                '#FF5252', // красный
+                '#FFD740', // желтый
+                '#69F0AE', // зеленый
+                '#448AFF', // синий
+                '#E040FB', // фиолетовый
+                '#FF4081'  // розовый
+            ];
+            return colors[type];
+        }
+
+        // Обработка клика по клетке
+        function handleCellClick(row, col) {
+            if (!gameState.gameActive || gameState.isAnimating) return;
+            
+            const cellIndex = row * BOARD_SIZE + col;
+            
+            if (gameState.selectedCell === null) {
+                // Выбор первой клетки
+                gameState.selectedCell = { row, col };
+                document.querySelectorAll('.cell')[cellIndex].classList.add('selected');
+            } else {
+                // Выбор второй клетки
+                const firstCell = gameState.selectedCell;
+                const secondCell = { row, col };
+                
+                // Проверка, являются ли клетки соседями
+                if (areNeighbors(firstCell, secondCell)) {
+                    // Снимаем выделение
+                    document.querySelectorAll('.cell')[firstCell.row * BOARD_SIZE + firstCell.col].classList.remove('selected');
+                    
+                    // Меняем клетки местами
+                    swapCells(firstCell, secondCell);
+                    
+                    // Увеличиваем счетчик ходов
+                    gameState.moves++;
+                    document.getElementById('moves').textContent = gameState.moves;
+                } else {
+                    // Снимаем выделение с предыдущей клетки
+                    document.querySelectorAll('.cell')[firstCell.row * BOARD_SIZE + firstCell.col].classList.remove('selected');
+                    
+                    // Выделяем новую клетку
+                    gameState.selectedCell = { row, col };
+                    document.querySelectorAll('.cell')[cellIndex].classList.add('selected');
+                }
+            }
+        }
+
+        // Проверка, являются ли клетки соседями
+        function areNeighbors(cell1, cell2) {
+            const rowDiff = Math.abs(cell1.row - cell2.row);
+            const colDiff = Math.abs(cell1.col - cell2.col);
+            
+            return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+        }
+
+        // Обмен клеток местами
+        function swapCells(cell1, cell2) {
+            gameState.isAnimating = true;
+            gameState.isSwapping = true;
+            
+            // Визуальная анимация обмена
+            animateSwap(cell1, cell2, () => {
+                // Фактический обмен в массиве
+                const temp = gameState.board[cell1.row][cell1.col];
+                gameState.board[cell1.row][cell1.col] = gameState.board[cell2.row][cell2.col];
+                gameState.board[cell2.row][cell2.col] = temp;
+                
+                // Проверка на совпадения
+                const matches = findMatches();
+                
+                if (matches.length > 0) {
+                    // Есть совпадения - удаляем их и обновляем поле
+                    removeMatches(matches);
+                } else {
+                    // Нет совпадений - возвращаем клетки на место
+                    animateSwap(cell2, cell1, () => {
+                        const temp = gameState.board[cell1.row][cell1.col];
+                        gameState.board[cell1.row][cell1.col] = gameState.board[cell2.row][cell2.col];
+                        gameState.board[cell2.row][cell2.col] = temp;
+                        updateBoard();
+                        gameState.isAnimating = false;
+                        gameState.isSwapping = false;
+                        gameState.selectedCell = null;
+                        
+                        // Проверка на возможные ходы
+                        if (!hasValidMoves()) {
+                            shuffleBoard();
+                        }
+                    });
+                }
+            });
+        }
+
+        // Анимация обмена клеток
+        function animateSwap(cell1, cell2, callback) {
+            const cells = document.querySelectorAll('.cell');
+            const cell1Elem = cells[cell1.row * BOARD_SIZE + cell1.col];
+            const cell2Elem = cells[cell2.row * BOARD_SIZE + cell2.col];
+            
+            // Получаем позиции клеток
+            const rect1 = cell1Elem.getBoundingClientRect();
+            const rect2 = cell2Elem.getBoundingClientRect();
+            
+            // Вычисляем смещение
+            const deltaX = rect2.left - rect1.left;
+            const deltaY = rect2.top - rect1.top;
+            
+            // Применяем анимацию
+            cell1Elem.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            cell1Elem.classList.add('moving');
+            
+            cell2Elem.style.transform = `translate(${-deltaX}px, ${-deltaY}px)`;
+            cell2Elem.classList.add('moving');
+            
+            // После завершения анимации
+            setTimeout(() => {
+                cell1Elem.style.transform = '';
+                cell2Elem.style.transform = '';
+                cell1Elem.classList.remove('moving');
+                cell2Elem.classList.remove('moving');
+                
+                if (callback) callback();
+            }, 300);
+        }
+
+        // Поиск совпадений на поле
+        function findMatches() {
+            const matches = [];
+            
+            // Проверка по горизонтали
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE - 2; col++) {
+                    const type = gameState.board[row][col];
+                    if (type !== -1 && 
+                        gameState.board[row][col+1] === type && 
+                        gameState.board[row][col+2] === type) {
+                        
+                        let matchLength = 3;
+                        while (col + matchLength < BOARD_SIZE && gameState.board[row][col+matchLength] === type) {
+                            matchLength++;
+                        }
+                        
+                        for (let i = 0; i < matchLength; i++) {
+                            matches.push({ row, col: col + i });
+                        }
+                        
+                        col += matchLength - 1;
+                    }
+                }
+            }
+            
+            // Проверка по вертикали
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                for (let row = 0; row < BOARD_SIZE - 2; row++) {
+                    const type = gameState.board[row][col];
+                    if (type !== -1 && 
+                        gameState.board[row+1][col] === type && 
+                        gameState.board[row+2][col] === type) {
+                        
+                        let matchLength = 3;
+                        while (row + matchLength < BOARD_SIZE && gameState.board[row+matchLength][col] === type) {
+                            matchLength++;
+                        }
+                        
+                        for (let i = 0; i < matchLength; i++) {
+                            matches.push({ row: row + i, col });
+                        }
+                        
+                        row += matchLength - 1;
+                    }
+                }
+            }
+            
+            // Удаляем дубликаты
+            return Array.from(new Set(matches.map(m => `${m.row},${m.col}`)))
+                        .map(str => {
+                            const [row, col] = str.split(',').map(Number);
+                            return { row, col };
+                        });
+        }
+
+        // Удаление совпадающих клеток
+        function removeMatches(matches) {
+            // Анимация исчезновения
+            animateRemoval(matches, () => {
+                // Удаляем клетки
+                matches.forEach(match => {
+                    gameState.board[match.row][match.col] = -1;
+                });
+                
+                // Обновляем очки
+                gameState.score += matches.length * 10;
+                document.getElementById('score').textContent = gameState.score;
+                
+                // Показываем комбо, если удалено больше 3 клеток
+                if (matches.length > 3) {
+                    showCombo(matches.length);
+                }
+                
+                // Заполняем пустые клетки
+                fillEmptyCells();
+            });
+        }
+
+        // Анимация удаления клеток
+        function animateRemoval(matches, callback) {
+            const cells = document.querySelectorAll('.cell');
+            
+            matches.forEach(match => {
+                const index = match.row * BOARD_SIZE + match.col;
+                cells[index].style.opacity = '0';
+                cells[index].style.transform = 'scale(0)';
+            });
+            
+            setTimeout(() => {
+                if (callback) callback();
+            }, 300);
+        }
+
+        // Заполнение пустых клеток
+        function fillEmptyCells() {
+            // Сдвигаем клетки вниз
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                let emptySpaces = 0;
+                
+                // Проходим снизу вверх
+                for (let row = BOARD_SIZE - 1; row >= 0; row--) {
+                    if (gameState.board[row][col] === -1) {
+                        emptySpaces++;
+                    } else if (emptySpaces > 0) {
+                        // Перемещаем клетку вниз
+                        gameState.board[row + emptySpaces][col] = gameState.board[row][col];
+                        gameState.board[row][col] = -1;
+                    }
+                }
+                
+                // Заполняем верхние пустые клетки новыми
+                for (let row = 0; row < emptySpaces; row++) {
+                    gameState.board[row][col] = Math.floor(Math.random() * CELL_TYPES);
+                }
+            }
+            
+            // Анимация падения клеток
+            animateFalling(() => {
+                // Проверяем новые совпадения
+                const newMatches = findMatches();
+                
+                if (newMatches.length > 0) {
+                    // Есть новые совпадения - удаляем их
+                    removeMatches(newMatches);
+                } else {
+                    // Нет новых совпадений - завершаем ход
+                    gameState.isAnimating = false;
+                    gameState.isSwapping = false;
+                    gameState.selectedCell = null;
+                    
+                    // Проверка на возможные ходы
+                    if (!hasValidMoves()) {
+                        shuffleBoard();
+                    }
+                }
+            });
+        }
+
+        // Анимация падения клеток
+        function animateFalling(callback) {
+            updateBoard();
+            
+            // Небольшая задержка для визуального эффекта
+            setTimeout(() => {
+                if (callback) callback();
+            }, 300);
+        }
+
+        // Обновление отображения доски
+        function updateBoard() {
+            const cells = document.querySelectorAll('.cell');
+            
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    const index = row * BOARD_SIZE + col;
+                    const type = gameState.board[row][col];
+                    
+                    if (type === -1) {
+                        cells[index].style.opacity = '0';
+                        cells[index].textContent = '';
+                    } else {
+                        cells[index].style.opacity = '1';
+                        cells[index].textContent = symbols[type];
+                        cells[index].style.backgroundColor = getColor(type);
+                        cells[index].style.transform = 'scale(1)';
+                    }
+                }
+            }
+        }
+
+        // Проверка наличия возможных ходов
+        function hasValidMoves() {
+            // Проверяем все возможные обмены
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    // Проверяем обмен с правой клеткой
+                    if (col < BOARD_SIZE - 1) {
+                        // Меняем местами
+                        const temp = gameState.board[row][col];
+                        gameState.board[row][col] = gameState.board[row][col+1];
+                        gameState.board[row][col+1] = temp;
+                        
+                        // Проверяем на совпадения
+                        if (findMatches().length > 0) {
+                            // Возвращаем на место
+                            gameState.board[row][col+1] = gameState.board[row][col];
+                            gameState.board[row][col] = temp;
+                            return true;
+                        }
+                        
+                        // Возвращаем на место
+                        gameState.board[row][col+1] = gameState.board[row][col];
+                        gameState.board[row][col] = temp;
+                    }
+                    
+                    // Проверяем обмен с нижней клеткой
+                    if (row < BOARD_SIZE - 1) {
+                        // Меняем местами
+                        const temp = gameState.board[row][col];
+                        gameState.board[row][col] = gameState.board[row+1][col];
+                        gameState.board[row+1][col] = temp;
+                        
+                        // Проверяем на совпадения
+                        if (findMatches().length > 0) {
+                            // Возвращаем на место
+                            gameState.board[row+1][col] = gameState.board[row][col];
+                            gameState.board[row][col] = temp;
+                            return true;
+                        }
+                        
+                        // Возвращаем на место
+                        gameState.board[row+1][col] = gameState.board[row][col];
+                        gameState.board[row][col] = temp;
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        // Перемешивание доски
+        function shuffleBoard() {
+            // Создаем новую доску
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    gameState.board[row][col] = Math.floor(Math.random() * CELL_TYPES);
+                }
+            }
+            
+            // Проверяем на совпадения и возможные ходы
+            if (findMatches().length > 0 || !hasValidMoves()) {
+                // Если после перемешивания есть совпадения или нет ходов, перемешиваем снова
+                shuffleBoard();
+            } else {
+                updateBoard();
+            }
+        }
+
+        // Показ комбо-сообщения
+        function showCombo(count) {
+            const comboText = document.createElement('div');
+            comboText.className = 'combo';
+            comboText.textContent = `COMBO x${count}!`;
+            comboText.style.left = '50%';
+            comboText.style.top = '50%';
+            comboText.style.transform = 'translate(-50%, -50%)';
+            
+            document.body.appendChild(comboText);
+            
+            // Анимация появления и исчезновения
+            setTimeout(() => {
+                comboText.style.opacity = '1';
+                comboText.style.transform = 'translate(-50%, -100%)';
+                
+                setTimeout(() => {
+                    comboText.style.opacity = '0';
+                    setTimeout(() => {
+                        document.body.removeChild(comboText);
+                    }, 500);
+                }, 1000);
+            }, 10);
+        }
+
+        // Обновление таймера
+        function updateTimer() {
+            if (!gameState.gameActive) return;
+            
+            gameState.timeLeft--;
+            document.getElementById('time').textContent = gameState.timeLeft;
+            
+            if (gameState.timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        // Завершение игры
+        function endGame() {
+            gameState.gameActive = false;
+            clearInterval(gameState.timer);
+            
+            alert(`Игра окончена! Ваш счет: ${gameState.score}`);
+        }
+
+        // Подсказка
+        function showHint() {
+            if (!gameState.gameActive || gameState.isAnimating) return;
+            
+            // Ищем возможный ход
+            for (let row = 0; row < BOARD_SIZE; row++) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    // Проверяем обмен с правой клеткой
+                    if (col < BOARD_SIZE - 1) {
+                        // Меняем местами
+                        const temp = gameState.board[row][col];
+                        gameState.board[row][col] = gameState.board[row][col+1];
+                        gameState.board[row][col+1] = temp;
+                        
+                        // Проверяем на совпадения
+                        if (findMatches().length > 0) {
+                            // Возвращаем на место
+                            gameState.board[row][col+1] = gameState.board[row][col];
+                            gameState.board[row][col] = temp;
+                            
+                            // Подсвечиваем клетки
+                            const cells = document.querySelectorAll('.cell');
+                            cells[row * BOARD_SIZE + col].style.boxShadow = '0 0 0 3px gold';
+                            cells[row * BOARD_SIZE + col + 1].style.boxShadow = '0 0 0 3px gold';
+                            
+                            // Убираем подсветку через 2 секунды
+                            setTimeout(() => {
+                                cells[row * BOARD_SIZE + col].style.boxShadow = '';
+                                cells[row * BOARD_SIZE + col + 1].style.boxShadow = '';
+                            }, 2000);
+                            
+                            return;
+                        }
+                        
+                        // Возвращаем на место
+                        gameState.board[row][col+1] = gameState.board[row][col];
+                        gameState.board[row][col] = temp;
+                    }
+                    
+                    // Проверяем обмен с нижней клеткой
+                    if (row < BOARD_SIZE - 1) {
+                        // Меняем местами
+                        const temp = gameState.board[row][col];
+                        gameState.board[row][col] = gameState.board[row+1][col];
+                        gameState.board[row+1][col] = temp;
+                        
+                        // Проверяем на совпадения
+                        if (findMatches().length > 0) {
+                            // Возвращаем на место
+                            gameState.board[row+1][col] = gameState.board[row][col];
+                            gameState.board[row][col] = temp;
+                            
+                            // Подсвечиваем клетки
+                            const cells = document.querySelectorAll('.cell');
+                            cells[row * BOARD_SIZE + col].style.boxShadow = '0 0 0 3px gold';
+                            cells[(row + 1) * BOARD_SIZE + col].style.boxShadow = '0 0 0 3px gold';
+                            
+                            // Убираем подсветку через 2 секунды
+                            setTimeout(() => {
+                                cells[row * BOARD_SIZE + col].style.boxShadow = '';
+                                cells[(row + 1) * BOARD_SIZE + col].style.boxShadow = '';
+                            }, 2000);
+                            
+                            return;
+                        }
+                        
+                        // Возвращаем на место
+                        gameState.board[row+1][col] = gameState.board[row][col];
+                        gameState.board[row][col] = temp;
+                    }
+                }
+            }
+        }
+
+        // Инициализация при загрузке страницы
+        window.onload = initGame;
+
+        // Обработчики кнопок
+        document.getElementById('restartBtn').addEventListener('click', initGame);
+        document.getElementById('hintBtn').addEventListener('click', showHint);
+    </script>
+</body>
+</html>
